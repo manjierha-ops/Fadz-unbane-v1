@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FADZ UNBANE</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #1e1e2f;
+      color: #e0e0ff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .container, .login-container, .loading-container {
+      max-width: 380px;
+      padding: 30px 20px;
+      background: rgba(30, 30, 47, 0.9);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .tutorial-btn {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: linear-gradient(135deg, #eab308, #f59e0b);
+      color: #1e1e2f;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 10px 16px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4);
+      z-index: 10;
+      transition: all 0.3s;
+    }
+
+    .tutorial-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 18px rgba(234, 179, 8, 0.6);
+    }
+
+    .clock {
+      font-size: 100px;
+      margin: 10px 0 30px;
+      line-height: 0.8;
+    }
+
+    .hour { color: #a78bfa; }
+    .minute { color: #6366f1; }
+
+    h1 {
+      font-size: 2.2rem;
+      margin: 10px 0;
+      color: #ff5555;
+      text-shadow: 0 0 10px rgba(255, 85, 85, 0.6);
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      margin: 8px 0;
+      color: #c4b5fd;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      margin: 20px 0 30px;
+    }
+
+    .input-pin {
+      width: 100%;
+      max-width: 220px;
+      padding: 14px;
+      font-size: 1.6rem;
+      text-align: center;
+      background: #2d2d44;
+      border: 2px solid #4f46e5;
+      border-radius: 12px;
+      color: white;
+      margin: 20px auto;
+      outline: none;
+    }
+
+    .input-pin:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+    }
+
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 16px 40px;
+      margin: 12px auto;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      width: 85%;
+      max-width: 320px;
+      box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4);
+      transition: all 0.25s;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.6);
+    }
+
+    .btn-indo {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .error {
+      color: #ff6b6b;
+      font-size: 1.1rem;
+      margin: 10px 0;
+      min-height: 24px;
+    }
+
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .loader-number {
+      font-size: 5rem;
+      font-weight: bold;
+      color: #a78bfa;
+      text-shadow: 0 0 20px rgba(167, 139, 250, 0.7);
+      margin: 20px 0;
+      min-width: 150px;
+    }
+
+    .loading-text {
+      font-size: 1.4rem;
+      color: #c4b5fd;
+      margin-top: 10px;
+    }
+
+    .progress-bar {
+      width: 80%;
+      max-width: 300px;
+      height: 12px;
+      background: #2d2d44;
+      border-radius: 6px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4f46e5, #7c3aed);
+      transition: width 0.1s linear;
+    }
+
+    .copy-message {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      color: #34d399;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .copy-message.show {
+      opacity: 1;
+    }
+
+    .warning {
+      font-size: 1.8rem;
+      margin: 40px 0 20px;
+      color: #f87171;
+    }
+
+    .credits {
+      margin-top: 50px;
+      font-size: 0.95rem;
+      color: #64748b;
+    }
+
+    /* Modal Tutorial */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: #2d2d44;
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 340px;
+      text-align: left;
+      position: relative;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 2rem;
+      color: #94a3b8;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .close-btn:hover {
+      color: white;
+    }
+
+    .tutorial-title {
+      font-size: 1.6rem;
+      color: #fbbf24;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .tutorial-text {
+      font-size: 1.1rem;
+      line-height: 1.5;
+      color: #e0e0ff;
+    }
+
+    .highlight {
+      color: #ff5555;
+      font-weight: bold;
+    }
+
+    /* Modal untuk Teks Manual */
+    .text-display {
+      background: #1e1e2f;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border: 1px solid #4f46e5;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 1rem;
+      color: #c4b5fd;
+      user-select: text; /* Biar bisa di-select */
+    }
+
+    .manual-copy-btn {
+      background: linear-gradient(135deg, #6ee7b7, #34d399);
+      color: #1e1e2f;
+      font-size: 1.1rem;
+      padding: 12px 30px;
+      margin-top: 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(52, 211, 153, 0.4);
+      transition: all 0.25s;
+    }
+
+    .manual-copy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(52, 211, 153, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Halaman Login -->
+  <div id="loginPage" class="login-container">
+    <h1>fadz unbane verse 1</h1>
+    <h2>LOGIN REQUIRED</h2>
+    <p class="subtitle">Masukkan PIN untuk masuk</p>
+    
+    <input type="tel" id="pinInput" class="input-pin" placeholder="PIN" maxlength="3" autocomplete="off">
+    
+    <button class="btn" onclick="checkPin()">MASUK</button>
+    
+    <div id="errorMsg" class="error"></div>
+  </div>
+
+  <!-- Halaman Loading -->
+  <div id="loadingPage" class="loading-container hidden">
+    <h2>Memproses Login...</h2>
+    <div class="loader-number" id="loaderNumber">1</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <p class="loading-text">Tunggu sebentar ya...</p>
+  </div>
+
+  <!-- Halaman Utama -->
+  <div id="mainPage" class="container hidden">
+
+    <button class="tutorial-btn" onclick="openTutorial()">TUTORIAL</button>
+
+    <div class="clock">
+      <span class="hour">FADZ</span><br>
+      <span class="minute">UNBANE</span>
+    </div>
+
+    <h1>UNBANE ACCOUNT WHATSAPP</h1>
+    <h2>FADZ UNBANE VERSE 1</h2>
+
+    <div class="subtitle">
+      Pilih teks unbane yang mau disalin<br>
+      Paste ke form tinjauan WhatsApp
+    </div>
+
+    <button class="btn" onclick="handleCopy('english')">TEKS UNBANE (INGGRIS)</button>
+    <button class="btn btn-indo" onclick="handleCopy('indo')">TEKS UNBANE (INDONESIA)</button>
+
+    <div id="copyMsg" class="copy-message">Teks sudah disalin ke clipboard! (Jika tidak, gunakan salin manual di modal)</div>
+
+    <div class="warning">fadz here⚠️⚠️⚠️</div>
+
+    <div class="credits">
+      Made with 👑 by Fadz
+    </div>
+
+  </div>
+
+  <!-- Modal Tutorial -->
+  <div id="tutorialModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeTutorial()">&times;</span>
+      <div class="tutorial-title">❗ Tutorial ❗</div>
+      <p class="tutorial-text">
+        <strong>Penting !!</strong><br>
+        Web ini atau apk ini <span class="highlight">gratis</span> dari fadz<br>
+        Jangan di perjual belikan<br>
+        <strong>FADZ UNBANE V1</strong><br><br>
+
+        <strong>Tutorial singkat❗</strong><br>
+        Tombol salin adalah untuk menyalin teks unbane jadi<br>
+        Klo memencet tombol nya akan tersalin<br><br>
+
+        <strong>Bagaimana cara mengunbane nya??</strong><br>
+        Cara nya pergi ke wa yang terbane🧾<br>
+        Masukin tinjauan masukan teks nya jangan lupa tambahkan<br>
+        Nomor WhatsApp mu dan sesudah di tinjau tunggu selam 24 jam
+      </p>
+    </div>
+  </div>
+
+  <!-- Modal untuk Tampilkan Teks Manual -->
+  <div id="textModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeTextModal()">&times;</span>
+      <div class="tutorial-title">Teks Unbane - Salin Manual</div>
+      <p class="tutorial-text">Select teks di bawah lalu salin manual (tekan lama lalu copy). Ganti nomor WA kamu ya!</p>
+      <div id="textDisplay" class="text-display"></div>
+      <button class="manual-copy-btn" onclick="copyFromModal()">COBA SALIN LAGI</button>
+    </div>
+  </div>
+
+  <script>
+    const CORRECT_PIN = "234";
+
+    const texts = {
+      english: `HELLO WHATSAPP DEVELOPER PLEASE RESTORE MY WHATSAPP ACCOUNT IMMEDIATELY, I USE WHATSAPP TO COMMUNICATE WITH IMPORTANT PEOPLE IN MY LIFE, WITHOUT THE WHATSAPP APP MY LIFE WILL BE PROBLEM, MY WHATSAPP ACCOUNT IS (+628XXX)`,
+      indo: `saya adalah pengguna aplikasi whatsapp dan saay tidak mengerti kenapa akun WhatsApp saya bisa di blokir secara spam. saya tidak pernah melakukan pelanggaran-pelanggaran ketentuan whatsapp. saya hanya menggunakan aplikasi whatsapp untuk keperluan sehari hari. saya membutuhkan aplikasi whatsapp untuk mengerjakan pekerjaan saya. saya mohon untuk di pulihkan kembali akun WhatsApp saya. saya harus menyelesaikan pekerjaan saya. saya sangat membutuhkan aplikasi WhatsApp. saya sangat menghargai waktu dan usaha developer whatsapp dalam menangani masalah ini. nomor whatsapp saya adalah +62`
+    };
+
+    let currentText = '';
+
+    function checkPin() {
+      const input = document.getElementById("pinInput").value.trim();
+      const error = document.getElementById("errorMsg");
+
+      if (input === CORRECT_PIN) {
+        document.getElementById("loginPage").classList.add("hidden");
+        document.getElementById("loadingPage").classList.remove("hidden");
+        startLoadingAnimation();
+      } else {
+        error.textContent = "PIN salah! Coba lagi.";
+        document.getElementById("pinInput").value = "";
+        document.getElementById("pinInput").focus();
+      }
+    }
+
+    document.getElementById("pinInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") checkPin();
+    });
+
+    function startLoadingAnimation() {
+      const numberDisplay = document.getElementById("loaderNumber");
+      const progressFill = document.getElementById("progressFill");
+      let current = 1;
+      const total = 100;
+      const duration = 5000;
+      const interval = duration / (total - 1);
+
+      const timer = setInterval(() => {
+        current++;
+        numberDisplay.textContent = current;
+        const percent = ((current - 1) / (total - 1)) * 100;
+        progressFill.style.width = percent + "%";
+
+        if (current >= total) {
+          clearInterval(timer);
+          setTimeout(() => {
+            document.getElementById("loadingPage").classList.add("hidden");
+            document.getElementById("mainPage").classList.remove("hidden");
+          }, 800);
+        }
+      }, interval);
+    }
+
+    function showCopyMessage() {
+      const msg = document.getElementById("copyMsg");
+      msg.classList.add("show");
+      setTimeout(() => msg.classList.remove("show"), 3000);
+    }
+
+    function handleCopy(type) {
+      currentText = texts[type];
+      navigator.clipboard.writeText(currentText)
+        .then(() => {
+          showCopyMessage();
+          openTextModal(); // Selalu tampilkan modal untuk salin manual
+        })
+        .catch(() => {
+          alert("Gagal salin otomatis. Gunakan salin manual di modal.");
+          openTextModal();
+        });
+    }
+
+    function openTextModal() {
+      document.getElementById("textDisplay").textContent = currentText;
+      document.getElementById("textModal").classList.add("show");
+    }
+
+    function closeTextModal() {
+      document.getElementById("textModal").classList.remove("show");
+    }
+
+    function copyFromModal() {
+      navigator.clipboard.writeText(currentText)
+        .then(() => alert("Teks berhasil disalin!"))
+        .catch(() => alert("Gagal salin, select manual teks di atas ya"));
+    }
+
+    function openTutorial() {
+      document.getElementById("tutorialModal").classList.add("show");
+    }
+
+    function closeTutorial() {
+      document.getElementById("tutorialModal").classList.remove("show");
+    }
+
+    document.getElementById("tutorialModal").addEventListener("click", function(e) {
+      if (e.target === this) closeTutorial();
+    });
+
+    document.getElementById("textModal").addEventListener("click", function(e) {
+      if (e.target === this) closeTextModal();
+    });
+  </script>
+
+</body>
+</html>
